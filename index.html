@@ -27,31 +27,34 @@
 </script>
 <style>
   :root {
-    --bg: #f4f6f9;
+    --bg: #eef2f7;
     --card: #ffffff;
-    --ink: #1a2433;
-    --muted: #5b6b80;
-    --line: #dde4ec;
-    --accent: #0b62d6;
-    --accent-soft: #e8f1fd;
-    --good: #157347;
-    --good-soft: #e3f5ec;
-    --info: #6f42c1;
-    --info-soft: #f1eafc;
-    --warn: #a06a00;
-    --warn-soft: #fdf3dd;
+    --ink: #0f172a;
+    --muted: #44566c;
+    --line: #d3dce8;
+    --accent: #0b5fd7;
+    --accent-2: #0891b2;
+    --accent-soft: #e5effd;
+    --good: #0e7a43;
+    --good-soft: #ddf3e7;
+    --info: #6d28d9;
+    --info-soft: #f0e9fc;
+    --warn: #8a5800;
+    --warn-soft: #fcf0d8;
     --danger: #b02a37;
-    --danger-soft: #fbe9eb;
+    --danger-soft: #fbe7ea;
     --radius: 14px;
+    --shadow: 0 1px 2px rgba(15,23,42,0.05), 0 4px 14px rgba(15,23,42,0.07);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #121a26;
-      --card: #1c2735;
-      --ink: #e8eef6;
-      --muted: #9db0c6;
-      --line: #33445a;
+      --bg: #0f1723;
+      --card: #1b2636;
+      --ink: #edf2f9;
+      --muted: #a4b6cc;
+      --line: #35485f;
       --accent: #5aa2f7;
+      --accent-2: #2cc7e0;
       --accent-soft: #1e3352;
       --good: #4cc38a;
       --good-soft: #173a2b;
@@ -61,20 +64,36 @@
       --warn-soft: #3d3316;
       --danger: #f28b96;
       --danger-soft: #47222a;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 4px 14px rgba(0,0,0,0.3);
     }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--ink);
-    line-height: 1.45;
+    line-height: 1.5;
     -webkit-text-size-adjust: 100%;
   }
+  body::before {
+    content: "";
+    display: block;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  }
   .wrap { max-width: 640px; margin: 0 auto; padding: 16px 14px 48px; }
-  header { text-align: center; padding: 10px 0 18px; }
-  header h1 { font-size: 1.35rem; margin: 0 0 4px; }
+  header { text-align: center; padding: 12px 0 18px; }
+  header h1 {
+    font-size: 1.4rem;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    letter-spacing: -0.01em;
+  }
+  header h1 .logo { width: 26px; height: 26px; color: var(--accent); flex-shrink: 0; }
   header p { margin: 0; color: var(--muted); font-size: 0.85rem; }
 
   .card {
@@ -83,35 +102,45 @@
     border-radius: var(--radius);
     padding: 16px;
     margin-bottom: 14px;
+    box-shadow: var(--shadow);
   }
+  .ico { width: 1.05em; height: 1.05em; vertical-align: -0.15em; flex-shrink: 0; }
   label.field-label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
   .hint { color: var(--muted); font-size: 0.8rem; margin: 0 0 6px; }
   input[type="number"], select {
     width: 100%;
     font-size: 1.15rem;
+    font-weight: 600;
     padding: 12px;
-    border: 1.5px solid var(--line);
-    border-radius: 10px;
+    border: 2px solid var(--line);
+    border-radius: 11px;
     background: var(--card);
     color: var(--ink);
     appearance: none;
+    touch-action: manipulation;
+    transition: border-color 0.15s ease;
   }
-  input[type="number"]:focus, select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
-  input[type="number"]:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
+  input[type="number"]:focus, select:focus { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
+  input[type="number"]:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; border-style: dashed; }
   .field { margin-bottom: 16px; }
 
   button.primary {
     width: 100%;
+    min-height: 52px;
     font-size: 1.1rem;
     font-weight: 700;
     padding: 14px;
     border: none;
-    border-radius: 10px;
-    background: var(--accent);
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
     color: #fff;
     cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 4px 12px rgba(11,95,215,0.28);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  button.primary:active { filter: brightness(0.9); }
+  button.primary:active { transform: scale(0.98); box-shadow: 0 2px 6px rgba(11,95,215,0.2); }
+  button.primary:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 
   .error {
     display: none;
@@ -128,10 +157,21 @@
   #results { display: none; }
   #results.show { display: block; }
 
-  .hero { text-align: center; }
-  .hero .sos-value { font-size: 3rem; font-weight: 800; line-height: 1.1; color: var(--accent); }
+  .hero { text-align: center; border-top: 4px solid var(--accent); }
+  .hero .sos-value {
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums;
+  }
   .hero .sos-detail { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
-  .hero .sos-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .hero .sos-label { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
 
   .badge {
     display: inline-block;
@@ -187,6 +227,7 @@
   }
   .switch input:checked + .slider { background: var(--accent); }
   .switch input:checked + .slider::before { transform: translateX(24px); }
+  .switch input:focus-visible + .slider { outline: 3px solid var(--accent); outline-offset: 2px; }
 
   .lock-note { display: none; font-size: 0.8rem; color: var(--warn); margin-top: 6px; font-weight: 600; }
   .lock-note.show { display: block; }
@@ -202,32 +243,37 @@
     border: 1.5px solid var(--line);
     border-radius: var(--radius);
     padding: 14px;
+    box-shadow: var(--shadow);
   }
-  .route-card.primary-route { border-color: var(--accent); }
-  .route-card h3 { margin: 0 0 2px; font-size: 0.95rem; }
-  .route-card .route-sub { color: var(--muted); font-size: 0.78rem; margin: 0 0 10px; }
+  .route-card.primary-route {
+    border: 2px solid var(--accent);
+    background: linear-gradient(180deg, var(--accent-soft), var(--card) 42%);
+  }
+  .route-card h3 { margin: 0 0 2px; font-size: 0.98rem; }
+  .route-card .route-sub { color: var(--muted); font-size: 0.8rem; margin: 0 0 10px; }
   .route-tag {
     display: inline-block;
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    background: var(--accent-soft);
-    color: var(--accent);
-    padding: 2px 8px;
+    letter-spacing: 0.07em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    padding: 3px 10px;
     border-radius: 999px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
-  .stat-line { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+  .stat-line { display: flex; justify-content: space-between; gap: 8px; font-size: 0.93rem; padding: 6px 0; border-bottom: 1px dashed var(--line); }
   .stat-line:last-of-type { border-bottom: none; }
   .stat-line .k { color: var(--muted); }
-  .stat-line .v { font-weight: 700; text-align: right; }
+  .stat-line .v { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
 
-  table.blocks { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
-  table.blocks th, table.blocks td { padding: 6px 4px; text-align: right; border-bottom: 1px solid var(--line); }
-  table.blocks th { color: var(--muted); font-weight: 600; font-size: 0.75rem; }
+  table.blocks { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  table.blocks th, table.blocks td { padding: 7px 4px; text-align: right; border-bottom: 1px solid var(--line); }
+  table.blocks th { color: var(--muted); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
   table.blocks th:first-child, table.blocks td:first-child { text-align: left; }
   table.blocks tr.best td { background: var(--accent-soft); font-weight: 700; }
+  table.blocks tr.best td:first-child { border-left: 3px solid var(--accent); }
   table.blocks .mini-badge { font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin-left: 4px; white-space: nowrap; }
   .mini-badge.info   { background: var(--info-soft);   color: var(--info); }
   .mini-badge.warn   { background: var(--warn-soft);   color: var(--warn); }
@@ -251,15 +297,19 @@
 
   .note { color: var(--muted); font-size: 0.75rem; margin-top: 8px; }
   .seo-explainer { margin-top: 24px; }
-  .seo-explainer summary { font-weight: 600; font-size: 0.95rem; cursor: pointer; }
+  .seo-explainer summary { font-weight: 600; font-size: 0.95rem; cursor: pointer; touch-action: manipulation; }
+  .seo-explainer summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
   .seo-explainer p { color: var(--muted); font-size: 0.85rem; }
   footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 28px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Share of Shelf Calculator</h1>
+    <h1><svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-6"/></svg>Share of Shelf Calculator</h1>
     <p>Nothing is saved or sent anywhere, and it works offline once loaded.</p>
   </header>
 
@@ -275,7 +325,7 @@
       <p class="hint">Count <strong>every</strong> facing that isn&rsquo;t yours: all rival brands, own-label, everything else on the fixture.</p>
       <input type="number" id="compIn" inputmode="numeric" min="0" step="1" placeholder="e.g. 58">
     </div>
-    <p class="lock-note" id="lockNote">&#128274; Inputs are locked. Switch off &ldquo;Lock competitor&rdquo; below to edit.</p>
+    <p class="lock-note" id="lockNote"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Inputs are locked. Switch off &ldquo;Lock competitor&rdquo; below to edit.</p>
     <button class="primary" id="calcBtn" type="button">Calculate</button>
     <div class="error" id="inputError"></div>
   </div>
@@ -284,7 +334,7 @@
   <div id="results">
 
     <div class="card hero">
-      <div class="sos-label">Current share of space</div>
+      <div class="sos-label">Current share of shelf</div>
       <div class="sos-value" id="heroSOS">&hellip;</div>
       <div class="sos-detail" id="heroDetail"></div>
       <div id="heroBadge"></div>
@@ -400,12 +450,15 @@
     return Math.ceil(v - EPS);
   }
 
+  var warnIco = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  var checkIco = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+
   // Realism banding for any resulting/current SOS (decimal 0-1)
   function sosBadge(dec, cls) {
     var s = dec * 100;
     cls = cls || "badge";
     if (s >= 95) {
-      return '<span class="' + cls + ' danger">&#9888; Almost certainly an input error</span>';
+      return '<span class="' + cls + ' danger">' + warnIco + ' Almost certainly an input error</span>';
     }
     if (s > 80) {
       return '<span class="' + cls + ' danger">Beyond typical real-world SOS</span>';
@@ -422,12 +475,12 @@
   function bigWarningIfNeeded(dec) {
     var s = dec * 100;
     if (s >= 95) {
-      return '<div class="big-warning">&#9888; A share of space of ' + fmtPct(dec) +
+      return '<div class="big-warning">' + warnIco + ' A share of shelf of ' + fmtPct(dec) +
         ' is far beyond anything seen in real fixtures. This almost always means an input error. ' +
         'Re-check your brand and competitor facing counts before trusting this result.</div>';
     }
     if (s > 80) {
-      return '<div class="big-warning">&#9888; A result above 80% is beyond typical real-world share of space. ' +
+      return '<div class="big-warning">' + warnIco + ' A result above 80% is beyond typical real-world share of shelf. ' +
         'It may be worth double-checking your inputs.</div>';
     }
     return "";
@@ -565,7 +618,7 @@
       keepLine = "You could lose up to <strong>" + canLose + "</strong> brand facing" + (canLose === 1 ? "" : "s") +
                  " (down to " + minB + ") and still hold " + fmtPct(t) + ".";
     }
-    var html = '<div class="achieved">&#10003; <strong>Target already achieved</strong>' +
+    var html = '<div class="achieved">' + checkIco + ' <strong>Target already achieved</strong>' +
                '<p>Your current SOS of ' + fmtPct(X / (X + Y)) + ' already meets the ' + fmtPct(t) + ' target.</p>';
     if (canLose > 0) {
       html += '<p>' + keepLine + '</p>';
