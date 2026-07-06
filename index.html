@@ -6,10 +6,25 @@
 <meta name="description" content="Free share of shelf (SOS) calculator for retail sales reps. Enter your brand and competitor facings to get your share of shelf and the exact facings needed to hit any target.">
 <link rel="canonical" href="https://shareofshelfcalculator.com/">
 <meta property="og:title" content="Share of Shelf Calculator">
-<meta property="og:description" content="Work out your share of shelf and the facings needed to hit any SOS target — free, instant, works offline.">
+<meta property="og:description" content="Work out your share of shelf and the facings needed to hit any SOS target. Free, instant, and works offline.">
 <meta property="og:url" content="https://shareofshelfcalculator.com/">
 <meta property="og:type" content="website">
-<title>Share of Shelf Calculator — Work Out Facings for Any SOS Target</title>
+<meta property="og:locale" content="en_GB">
+<meta name="theme-color" content="#0b62d6">
+<title>Share of Shelf Calculator | Work Out Facings for Any SOS Target</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Share of Shelf Calculator",
+  "url": "https://shareofshelfcalculator.com/",
+  "description": "Free share of shelf (SOS) calculator for retail sales reps. Enter brand and competitor facings to get your share of shelf and the exact facings needed to hit any target.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+}
+</script>
 <style>
   :root {
     --bg: #f4f6f9;
@@ -245,7 +260,7 @@
 <div class="wrap">
   <header>
     <h1>Share of Shelf Calculator</h1>
-    <p>Nothing is saved or sent anywhere &mdash; works offline once loaded.</p>
+    <p>Nothing is saved or sent anywhere, and it works offline once loaded.</p>
   </header>
 
   <!-- ============ INPUTS ============ -->
@@ -257,10 +272,10 @@
     </div>
     <div class="field">
       <label class="field-label" for="compIn">All non-brand facings (competitors)</label>
-      <p class="hint">Count <strong>every</strong> facing that isn&rsquo;t yours &mdash; all rival brands, own-label, everything else on the fixture.</p>
+      <p class="hint">Count <strong>every</strong> facing that isn&rsquo;t yours: all rival brands, own-label, everything else on the fixture.</p>
       <input type="number" id="compIn" inputmode="numeric" min="0" step="1" placeholder="e.g. 58">
     </div>
-    <p class="lock-note" id="lockNote">&#128274; Inputs are locked &mdash; switch off &ldquo;Lock competitor&rdquo; below to edit.</p>
+    <p class="lock-note" id="lockNote">&#128274; Inputs are locked. Switch off &ldquo;Lock competitor&rdquo; below to edit.</p>
     <button class="primary" id="calcBtn" type="button">Calculate</button>
     <div class="error" id="inputError"></div>
   </div>
@@ -270,7 +285,7 @@
 
     <div class="card hero">
       <div class="sos-label">Current share of space</div>
-      <div class="sos-value" id="heroSOS">&ndash;</div>
+      <div class="sos-value" id="heroSOS">&hellip;</div>
       <div class="sos-detail" id="heroDetail"></div>
       <div id="heroBadge"></div>
     </div>
@@ -330,14 +345,14 @@
   <section class="card seo-explainer">
     <details>
       <summary>What is share of shelf?</summary>
-      <p>Share of shelf (SOS) &mdash; also called share of space &mdash; is the proportion of a retail fixture your brand occupies, measured in facings. If your products have 41 facings and every other product on the fixture has 58 between them, your share of shelf is 41 &divide; 99 = 41.4%.</p>
+      <p>Share of shelf (SOS), also called share of space, is the proportion of a retail fixture your brand occupies, measured in facings. The share of shelf formula is simple: brand facings &divide; total facings &times; 100. If your products have 41 facings and every other product on the fixture has 58 between them, your share of shelf is 41 &divide; 99 = 41.4%.</p>
       <p>This share of shelf calculator works out your current SOS and shows two routes to any target: taking facings from competitors on a fixed fixture, or adding a secondary display so the total grows while competitor facings stay the same. It handles the block sizes that real secondary displays come in, and flags targets that are unrealistically high.</p>
       <p>It&rsquo;s built for field sales reps and merchandisers to use in-store on a phone: no sign-up, no data stored, and it works offline once loaded.</p>
     </details>
   </section>
 
   <footer>
-    Stateless calculator &mdash; no store, product or personal data is stored anywhere.
+    Stateless calculator. No store, product or personal data is stored anywhere.
   </footer>
 </div>
 
@@ -385,7 +400,7 @@
     return Math.ceil(v - EPS);
   }
 
-  // Realism banding for any resulting/current SOS (decimal 0–1)
+  // Realism banding for any resulting/current SOS (decimal 0-1)
   function sosBadge(dec, cls) {
     var s = dec * 100;
     cls = cls || "badge";
@@ -408,8 +423,8 @@
     var s = dec * 100;
     if (s >= 95) {
       return '<div class="big-warning">&#9888; A share of space of ' + fmtPct(dec) +
-        ' is far beyond anything seen in real fixtures. This almost always means an input error &mdash; ' +
-        're-check your brand and competitor facing counts before trusting this result.</div>';
+        ' is far beyond anything seen in real fixtures. This almost always means an input error. ' +
+        'Re-check your brand and competitor facing counts before trusting this result.</div>';
     }
     if (s > 80) {
       return '<div class="big-warning">&#9888; A result above 80% is beyond typical real-world share of space. ' +
@@ -477,7 +492,7 @@
     var r = routeA(t, X, Y);
     var html = '<div class="route-card' + (isPrimary ? ' primary-route' : '') + '">';
     if (isPrimary) html += '<span class="route-tag">Recommended</span>';
-    html += '<h3>Route A &mdash; take from competitor</h3>' +
+    html += '<h3>Route A: take from competitor</h3>' +
             '<p class="route-sub">Total stays at ' + (X + Y) + '; competitor space reduces as yours grows.</p>';
     if (!r.possible) {
       html += '<div class="route-msg">This target can&rsquo;t be reached on a fixed total.</div>';
@@ -487,7 +502,7 @@
               statLine("New ratio (brand / competitor)", r.needed + " / " + r.newComp) +
               statLine("Resulting SOS", fmtPct(r.sos) + " " + sosBadge(r.sos, "mini-badge"));
       if (locked) {
-        html += '<div class="route-msg" style="margin-top:10px;">Competitor is locked &mdash; unlock to plan on taking competitor space.</div>';
+        html += '<div class="route-msg" style="margin-top:10px;">Competitor is locked. Unlock to plan on taking competitor space.</div>';
       }
     }
     html += '</div>';
@@ -498,7 +513,7 @@
     var r = routeB(t, X, Y, block);
     var html = '<div class="route-card' + (isPrimary ? ' primary-route' : '') + '">';
     if (isPrimary) html += '<span class="route-tag">Recommended</span>';
-    html += '<h3>Route B &mdash; add a secondary display</h3>' +
+    html += '<h3>Route B: add a secondary display</h3>' +
             '<p class="route-sub">Competitor stays at ' + Y + '; brand facings added in blocks of ' + block + '.</p>';
     if (!r.possible) {
       html += '<div class="route-msg">A target of 100% or more can&rsquo;t be reached by adding facings while any competitor facings remain.</div></div>';
@@ -555,7 +570,7 @@
     if (canLose > 0) {
       html += '<p>' + keepLine + '</p>';
     } else {
-      html += '<p>You are exactly at the minimum &mdash; losing any facings would drop you below the target.</p>';
+      html += '<p>You are exactly at the minimum. Losing any facings would drop you below the target.</p>';
     }
     html += '</div>';
     return html;
@@ -569,7 +584,7 @@
     if (xs === "" || ys === "") return { err: "Please fill in both facing counts." };
     var X = Number(xs), Y = Number(ys);
     if (!isFinite(X) || !isFinite(Y)) return { err: "Facing counts must be numbers." };
-    if (!Number.isInteger(X) || !Number.isInteger(Y)) return { err: "Facing counts must be whole numbers &mdash; no fractional facings." };
+    if (!Number.isInteger(X) || !Number.isInteger(Y)) return { err: "Facing counts must be whole numbers (no fractional facings)." };
     if (X < 0 || Y < 0) return { err: "Facing counts can&rsquo;t be negative." };
     if (X + Y === 0) return { err: "Brand and competitor facings can&rsquo;t both be zero." };
     return { X: X, Y: Y };
@@ -605,7 +620,7 @@
 
     // Hero
     heroSOS.textContent = fmtPct(sos);
-    heroDetail.textContent = X + " brand / " + Y + " competitor — " + total + " facings in total";
+    heroDetail.textContent = X + " brand / " + Y + " competitor, " + total + " facings in total";
     heroBadge.innerHTML = sosBadge(sos) + bigWarningIfNeeded(sos);
 
     // Next 5% threshold (strictly above current; exact multiples move up)
@@ -614,11 +629,11 @@
     if (threshold >= 100) {
       thTitle.innerHTML = "Next 5% threshold";
       thArea.innerHTML = '<div class="card"><div class="route-msg">There is no realistic next 5% threshold above ' +
-        fmtPct(sos) + '. A share this high almost always means an input error &mdash; please re-check your brand and competitor counts.</div></div>';
+        fmtPct(sos) + '. A share this high almost always means an input error. Please re-check your brand and competitor counts.</div></div>';
     } else {
       var tDec = threshold / 100;
       thTitle.innerHTML = 'Next 5% threshold: <span style="color:var(--accent)">' + threshold + '%</span>' +
-        '<span class="sub">Two routes to get there &mdash; ' +
+        '<span class="sub">Two routes to get there: ' +
         (locked ? 'competitor locked, so adding a display is recommended.' : 'taking competitor space is the primary method.') + '</span>';
       thArea.innerHTML = renderRoutes(tDec, X, Y, block, locked);
     }
