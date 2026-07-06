@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Share of Space calculator — stateless, works offline, nothing is stored.">
+<title>Share of Space Calculator</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --ink: #1a2433;
+    --muted: #5b6b80;
+    --line: #dde4ec;
+    --accent: #0b62d6;
+    --accent-soft: #e8f1fd;
+    --good: #157347;
+    --good-soft: #e3f5ec;
+    --info: #6f42c1;
+    --info-soft: #f1eafc;
+    --warn: #a06a00;
+    --warn-soft: #fdf3dd;
+    --danger: #b02a37;
+    --danger-soft: #fbe9eb;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121a26;
+      --card: #1c2735;
+      --ink: #e8eef6;
+      --muted: #9db0c6;
+      --line: #33445a;
+      --accent: #5aa2f7;
+      --accent-soft: #1e3352;
+      --good: #4cc38a;
+      --good-soft: #173a2b;
+      --info: #b89af0;
+      --info-soft: #2e2447;
+      --warn: #f0c05a;
+      --warn-soft: #3d3316;
+      --danger: #f28b96;
+      --danger-soft: #47222a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 16px 14px 48px; }
+  header { text-align: center; padding: 10px 0 18px; }
+  header h1 { font-size: 1.35rem; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--muted); font-size: 0.85rem; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  label.field-label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+  .hint { color: var(--muted); font-size: 0.8rem; margin: 0 0 6px; }
+  input[type="number"], select {
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--ink);
+    appearance: none;
+  }
+  input[type="number"]:focus, select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+  input[type="number"]:disabled { background: var(--bg); color: var(--muted); cursor: not-allowed; }
+  .field { margin-bottom: 16px; }
+
+  button.primary {
+    width: 100%;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  button.primary:active { filter: brightness(0.9); }
+
+  .error {
+    display: none;
+    background: var(--danger-soft);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    margin-top: 12px;
+  }
+  .error.show { display: block; }
+
+  #results { display: none; }
+  #results.show { display: block; }
+
+  .hero { text-align: center; }
+  .hero .sos-value { font-size: 3rem; font-weight: 800; line-height: 1.1; color: var(--accent); }
+  .hero .sos-detail { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .hero .sos-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-top: 8px;
+  }
+  .badge.info   { background: var(--info-soft);   color: var(--info); }
+  .badge.warn   { background: var(--warn-soft);   color: var(--warn); }
+  .badge.danger { background: var(--danger-soft); color: var(--danger); }
+  .badge.good   { background: var(--good-soft);   color: var(--good); }
+
+  .big-warning {
+    background: var(--danger-soft);
+    border: 2px solid var(--danger);
+    color: var(--danger);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-top: 12px;
+    text-align: left;
+  }
+
+  .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .settings-row + .settings-row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .settings-row .label-side { flex: 1; }
+  .settings-row .label-side strong { font-size: 0.95rem; }
+  .settings-row .label-side .hint { margin: 2px 0 0; }
+  .settings-row select { width: auto; min-width: 90px; font-size: 1rem; padding: 8px 10px; }
+
+  /* Toggle switch */
+  .switch { position: relative; display: inline-block; width: 54px; height: 30px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: var(--line);
+    border-radius: 999px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .slider::before {
+    content: "";
+    position: absolute;
+    width: 24px; height: 24px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(24px); }
+
+  .lock-note { display: none; font-size: 0.8rem; color: var(--warn); margin-top: 6px; font-weight: 600; }
+  .lock-note.show { display: block; }
+
+  h2.section-title { font-size: 1.05rem; margin: 22px 0 10px; }
+  h2.section-title .sub { display: block; font-size: 0.8rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+
+  .routes { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 600px) { .routes { grid-template-columns: 1fr 1fr; } }
+
+  .route-card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+  .route-card.primary-route { border-color: var(--accent); }
+  .route-card h3 { margin: 0 0 2px; font-size: 0.95rem; }
+  .route-card .route-sub { color: var(--muted); font-size: 0.78rem; margin: 0 0 10px; }
+  .route-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 6px;
+  }
+  .stat-line { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+  .stat-line:last-of-type { border-bottom: none; }
+  .stat-line .k { color: var(--muted); }
+  .stat-line .v { font-weight: 700; text-align: right; }
+
+  table.blocks { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 10px; }
+  table.blocks th, table.blocks td { padding: 6px 4px; text-align: right; border-bottom: 1px solid var(--line); }
+  table.blocks th { color: var(--muted); font-weight: 600; font-size: 0.75rem; }
+  table.blocks th:first-child, table.blocks td:first-child { text-align: left; }
+  table.blocks tr.best td { background: var(--accent-soft); font-weight: 700; }
+  table.blocks .mini-badge { font-size: 0.68rem; font-weight: 700; padding: 1px 6px; border-radius: 999px; margin-left: 4px; white-space: nowrap; }
+  .mini-badge.info   { background: var(--info-soft);   color: var(--info); }
+  .mini-badge.warn   { background: var(--warn-soft);   color: var(--warn); }
+  .mini-badge.danger { background: var(--danger-soft); color: var(--danger); }
+
+  .achieved {
+    background: var(--good-soft);
+    border: 1.5px solid var(--good);
+    border-radius: var(--radius);
+    padding: 14px;
+    color: var(--good);
+  }
+  .achieved strong { font-size: 1rem; }
+  .achieved p { margin: 6px 0 0; color: var(--ink); font-size: 0.9rem; }
+
+  .route-msg { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 10px; font-size: 0.85rem; font-weight: 600; }
+
+  .custom-inputs { display: flex; gap: 10px; align-items: flex-end; }
+  .custom-inputs .field { flex: 1; margin-bottom: 0; }
+  .or-sep { color: var(--muted); font-size: 0.8rem; padding-bottom: 14px; }
+
+  .note { color: var(--muted); font-size: 0.75rem; margin-top: 8px; }
+  footer { text-align: center; color: var(--muted); font-size: 0.75rem; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Share of Space Calculator</h1>
+    <p>Nothing is saved or sent anywhere &mdash; works offline once loaded.</p>
+  </header>
+
+  <!-- ============ INPUTS ============ -->
+  <div class="card" id="inputCard">
+    <div class="field">
+      <label class="field-label" for="brandIn">Your brand facings</label>
+      <p class="hint">Count only your own product&rsquo;s facings on the fixture.</p>
+      <input type="number" id="brandIn" inputmode="numeric" min="0" step="1" placeholder="e.g. 41">
+    </div>
+    <div class="field">
+      <label class="field-label" for="compIn">All non-brand facings (competitors)</label>
+      <p class="hint">Count <strong>every</strong> facing that isn&rsquo;t yours &mdash; all rival brands, own-label, everything else on the fixture.</p>
+      <input type="number" id="compIn" inputmode="numeric" min="0" step="1" placeholder="e.g. 58">
+    </div>
+    <p class="lock-note" id="lockNote">&#128274; Inputs are locked &mdash; switch off &ldquo;Lock competitor&rdquo; below to edit.</p>
+    <button class="primary" id="calcBtn" type="button">Calculate</button>
+    <div class="error" id="inputError"></div>
+  </div>
+
+  <!-- ============ RESULTS ============ -->
+  <div id="results">
+
+    <div class="card hero">
+      <div class="sos-label">Current share of space</div>
+      <div class="sos-value" id="heroSOS">&ndash;</div>
+      <div class="sos-detail" id="heroDetail"></div>
+      <div id="heroBadge"></div>
+    </div>
+
+    <div class="card">
+      <div class="settings-row">
+        <div class="label-side">
+          <strong>Lock competitor facings</strong>
+          <p class="hint">Locks all inputs at their current values. Locked mode plans by adding a secondary display (Route B).</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="lockToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div class="label-side">
+          <strong>Secondary display block size</strong>
+          <p class="hint">Extra brand facings can only be added in whole blocks of this size.</p>
+        </div>
+        <select id="blockSize">
+          <option value="2">2</option>
+          <option value="4" selected>4</option>
+          <option value="6">6</option>
+          <option value="8">8</option>
+          <option value="12">12</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="section-title" id="thresholdTitle">Next 5% threshold</h2>
+    <div id="thresholdArea"></div>
+
+    <h2 class="section-title">Custom target
+      <span class="sub">Enter any percentage, or pick a 5% step.</span>
+    </h2>
+    <div class="card">
+      <div class="custom-inputs">
+        <div class="field">
+          <label class="field-label" for="customNum">Target %</label>
+          <input type="number" id="customNum" inputmode="decimal" min="0.1" max="99.9" step="0.1" placeholder="e.g. 42.5">
+        </div>
+        <div class="or-sep">or</div>
+        <div class="field">
+          <label class="field-label" for="customSel">5% steps</label>
+          <select id="customSel">
+            <option value="">Choose&hellip;</option>
+          </select>
+        </div>
+      </div>
+      <div class="error" id="customError"></div>
+    </div>
+    <div id="customArea"></div>
+
+  </div>
+
+  <footer>
+    Stateless calculator &mdash; no store, product or personal data is stored anywhere.
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var EPS = 1e-9;
+
+  var brandIn   = document.getElementById("brandIn");
+  var compIn    = document.getElementById("compIn");
+  var calcBtn   = document.getElementById("calcBtn");
+  var inputErr  = document.getElementById("inputError");
+  var results   = document.getElementById("results");
+  var heroSOS   = document.getElementById("heroSOS");
+  var heroDetail= document.getElementById("heroDetail");
+  var heroBadge = document.getElementById("heroBadge");
+  var lockToggle= document.getElementById("lockToggle");
+  var lockNote  = document.getElementById("lockNote");
+  var blockSel  = document.getElementById("blockSize");
+  var thTitle   = document.getElementById("thresholdTitle");
+  var thArea    = document.getElementById("thresholdArea");
+  var customNum = document.getElementById("customNum");
+  var customSel = document.getElementById("customSel");
+  var customErr = document.getElementById("customError");
+  var customArea= document.getElementById("customArea");
+
+  // Populate the 5% step dropdown (5 … 95)
+  for (var p = 5; p <= 95; p += 5) {
+    var opt = document.createElement("option");
+    opt.value = String(p);
+    opt.textContent = p + "%";
+    customSel.appendChild(opt);
+  }
+
+  var hasCalculated = false;
+
+  // ---------- helpers ----------
+
+  function fmtPct(dec) {
+    return (Math.round(dec * 1000) / 10).toFixed(1) + "%";
+  }
+
+  function ceilSafe(v) {
+    return Math.ceil(v - EPS);
+  }
+
+  // Realism banding for any resulting/current SOS (decimal 0–1)
+  function sosBadge(dec, cls) {
+    var s = dec * 100;
+    cls = cls || "badge";
+    if (s >= 95) {
+      return '<span class="' + cls + ' danger">&#9888; Almost certainly an input error</span>';
+    }
+    if (s > 80) {
+      return '<span class="' + cls + ' danger">Beyond typical real-world SOS</span>';
+    }
+    if (s > 70) {
+      return '<span class="' + cls + ' warn">Unusually high target</span>';
+    }
+    if (s > 60) {
+      return '<span class="' + cls + ' info">Strong / overachieving</span>';
+    }
+    return "";
+  }
+
+  function bigWarningIfNeeded(dec) {
+    var s = dec * 100;
+    if (s >= 95) {
+      return '<div class="big-warning">&#9888; A share of space of ' + fmtPct(dec) +
+        ' is far beyond anything seen in real fixtures. This almost always means an input error &mdash; ' +
+        're-check your brand and competitor facing counts before trusting this result.</div>';
+    }
+    if (s > 80) {
+      return '<div class="big-warning">&#9888; A result above 80% is beyond typical real-world share of space. ' +
+        'It may be worth double-checking your inputs.</div>';
+    }
+    return "";
+  }
+
+  // ---------- route maths ----------
+
+  // Route A: total fixed, competitor shrinks as brand grows.
+  function routeA(t, X, Y) {
+    var total = X + Y;
+    var needed = ceilSafe(t * total);
+    if (needed > total) return { possible: false };
+    var newComp = total - needed;
+    return {
+      possible: true,
+      needed: needed,
+      extra: needed - X,
+      newComp: newComp,
+      total: total,
+      sos: needed / total
+    };
+  }
+
+  // Route B: competitor fixed, brand added in whole blocks.
+  function routeB(t, X, Y, block) {
+    if (t >= 1 - EPS) return { possible: false, reason: "hundred" };
+    var rawNeeded = ceilSafe(t * Y / (1 - t));
+    var rawToAdd = rawNeeded - X;
+    if (rawToAdd <= 0) rawToAdd = 0; // already at/above target
+    var blocksNeeded = Math.max(1, ceilSafe(rawToAdd / block));
+
+    var options = [];
+    var m = blocksNeeded;
+    var maxOptions = 10;
+    var hitCeiling = false;
+    while (options.length < maxOptions) {
+      var added = m * block;
+      var newX = X + added;
+      var newTotal = newX + Y;
+      var sos = newX / newTotal;
+      options.push({ added: added, blocks: m, newX: newX, newTotal: newTotal, sos: sos });
+      if (sos * 100 > 80) { hitCeiling = true; break; } // stop once resulting SOS passes ~80%
+      m += 1;
+    }
+    return {
+      possible: true,
+      rawNeeded: rawNeeded,
+      rawToAdd: rawToAdd,
+      options: options,
+      hitCeiling: hitCeiling,
+      best: options[0]
+    };
+  }
+
+  // ---------- rendering ----------
+
+  function statLine(k, v) {
+    return '<div class="stat-line"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+  }
+
+  function renderRouteACard(t, X, Y, isPrimary, locked) {
+    var r = routeA(t, X, Y);
+    var html = '<div class="route-card' + (isPrimary ? ' primary-route' : '') + '">';
+    if (isPrimary) html += '<span class="route-tag">Recommended</span>';
+    html += '<h3>Route A &mdash; take from competitor</h3>' +
+            '<p class="route-sub">Total stays at ' + (X + Y) + '; competitor space reduces as yours grows.</p>';
+    if (!r.possible) {
+      html += '<div class="route-msg">This target can&rsquo;t be reached on a fixed total.</div>';
+    } else {
+      html += statLine("Brand facings needed", String(r.needed)) +
+              statLine("More facings vs current", "+" + r.extra) +
+              statLine("New ratio (brand / competitor)", r.needed + " / " + r.newComp) +
+              statLine("Resulting SOS", fmtPct(r.sos) + " " + sosBadge(r.sos, "mini-badge"));
+      if (locked) {
+        html += '<div class="route-msg" style="margin-top:10px;">Competitor is locked &mdash; unlock to plan on taking competitor space.</div>';
+      }
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderRouteBCard(t, X, Y, block, isPrimary) {
+    var r = routeB(t, X, Y, block);
+    var html = '<div class="route-card' + (isPrimary ? ' primary-route' : '') + '">';
+    if (isPrimary) html += '<span class="route-tag">Recommended</span>';
+    html += '<h3>Route B &mdash; add a secondary display</h3>' +
+            '<p class="route-sub">Competitor stays at ' + Y + '; brand facings added in blocks of ' + block + '.</p>';
+    if (!r.possible) {
+      html += '<div class="route-msg">A target of 100% or more can&rsquo;t be reached by adding facings while any competitor facings remain.</div></div>';
+      return html;
+    }
+    var best = r.best;
+    html += statLine("Facings to add", "+" + best.added + " (" + best.blocks + " &times; block of " + block + ")") +
+            statLine("New brand total", String(best.newX)) +
+            statLine("New overall total", String(best.newTotal)) +
+            statLine("Resulting SOS", fmtPct(best.sos) + " " + sosBadge(best.sos, "mini-badge"));
+
+    html += '<table class="blocks"><thead><tr>' +
+            '<th>Add</th><th>Brand</th><th>Total</th><th>SOS</th>' +
+            '</tr></thead><tbody>';
+    for (var i = 0; i < r.options.length; i++) {
+      var o = r.options[i];
+      html += '<tr' + (i === 0 ? ' class="best"' : '') + '>' +
+              '<td>+' + o.added + '</td>' +
+              '<td>' + o.newX + '</td>' +
+              '<td>' + o.newTotal + '</td>' +
+              '<td>' + fmtPct(o.sos) + (sosBadge(o.sos, "mini-badge") ? " " + sosBadge(o.sos, "mini-badge") : "") + '</td>' +
+              '</tr>';
+    }
+    html += '</tbody></table>';
+    html += '<p class="note">' + (r.hitCeiling
+      ? 'Options stop once the resulting SOS passes ~80%.'
+      : 'Showing the first ' + r.options.length + ' block option' + (r.options.length === 1 ? '' : 's') + ' (capped at ~80% SOS).') + '</p>';
+    html += '</div>';
+    return html;
+  }
+
+  function renderRoutes(t, X, Y, block, locked) {
+    var a = renderRouteACard(t, X, Y, !locked, locked);
+    var b = renderRouteBCard(t, X, Y, block, locked);
+    // Primary route first
+    return '<div class="routes">' + (locked ? b + a : a + b) + '</div>';
+  }
+
+  function renderAchieved(t, X, Y) {
+    var minB, canLose, keepLine;
+    if (Y === 0) {
+      minB = 1;
+      canLose = Math.max(0, X - 1);
+      keepLine = "With no competitor facings you hold 100% however many facings you keep (minimum 1).";
+    } else {
+      minB = ceilSafe(t * Y / (1 - t));
+      if (minB < 0) minB = 0;
+      canLose = X - minB;
+      keepLine = "You could lose up to <strong>" + canLose + "</strong> brand facing" + (canLose === 1 ? "" : "s") +
+                 " (down to " + minB + ") and still hold " + fmtPct(t) + ".";
+    }
+    var html = '<div class="achieved">&#10003; <strong>Target already achieved</strong>' +
+               '<p>Your current SOS of ' + fmtPct(X / (X + Y)) + ' already meets the ' + fmtPct(t) + ' target.</p>';
+    if (canLose > 0) {
+      html += '<p>' + keepLine + '</p>';
+    } else {
+      html += '<p>You are exactly at the minimum &mdash; losing any facings would drop you below the target.</p>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // ---------- validation ----------
+
+  function readFacings() {
+    var xs = brandIn.value.trim();
+    var ys = compIn.value.trim();
+    if (xs === "" || ys === "") return { err: "Please fill in both facing counts." };
+    var X = Number(xs), Y = Number(ys);
+    if (!isFinite(X) || !isFinite(Y)) return { err: "Facing counts must be numbers." };
+    if (!Number.isInteger(X) || !Number.isInteger(Y)) return { err: "Facing counts must be whole numbers &mdash; no fractional facings." };
+    if (X < 0 || Y < 0) return { err: "Facing counts can&rsquo;t be negative." };
+    if (X + Y === 0) return { err: "Brand and competitor facings can&rsquo;t both be zero." };
+    return { X: X, Y: Y };
+  }
+
+  function readCustomTarget() {
+    var v = customNum.value.trim();
+    if (v === "") return null;
+    var t = Number(v);
+    if (!isFinite(t)) return { err: "Target must be a number." };
+    if (t <= 0) return { err: "Target must be above 0%." };
+    if (t >= 100) return { err: "A target of 100% or more isn&rsquo;t achievable while any competitor facings remain. Enter a target below 100%." };
+    return { pct: t };
+  }
+
+  // ---------- main calculation ----------
+
+  function calculate() {
+    var f = readFacings();
+    if (f.err) {
+      inputErr.innerHTML = f.err;
+      inputErr.classList.add("show");
+      results.classList.remove("show");
+      return;
+    }
+    inputErr.classList.remove("show");
+
+    var X = f.X, Y = f.Y;
+    var total = X + Y;
+    var sos = X / total;
+    var locked = lockToggle.checked;
+    var block = parseInt(blockSel.value, 10);
+
+    // Hero
+    heroSOS.textContent = fmtPct(sos);
+    heroDetail.textContent = X + " brand / " + Y + " competitor — " + total + " facings in total";
+    heroBadge.innerHTML = sosBadge(sos) + bigWarningIfNeeded(sos);
+
+    // Next 5% threshold (strictly above current; exact multiples move up)
+    var pct = sos * 100;
+    var threshold = (Math.floor(pct / 5 + EPS) + 1) * 5;
+    if (threshold >= 100) {
+      thTitle.innerHTML = "Next 5% threshold";
+      thArea.innerHTML = '<div class="card"><div class="route-msg">There is no realistic next 5% threshold above ' +
+        fmtPct(sos) + '. A share this high almost always means an input error &mdash; please re-check your brand and competitor counts.</div></div>';
+    } else {
+      var tDec = threshold / 100;
+      thTitle.innerHTML = 'Next 5% threshold: <span style="color:var(--accent)">' + threshold + '%</span>' +
+        '<span class="sub">Two routes to get there &mdash; ' +
+        (locked ? 'competitor locked, so adding a display is recommended.' : 'taking competitor space is the primary method.') + '</span>';
+      thArea.innerHTML = renderRoutes(tDec, X, Y, block, locked);
+    }
+
+    // Custom target
+    var ct = readCustomTarget();
+    if (ct === null) {
+      customErr.classList.remove("show");
+      customArea.innerHTML = "";
+    } else if (ct.err) {
+      customErr.innerHTML = ct.err;
+      customErr.classList.add("show");
+      customArea.innerHTML = "";
+    } else {
+      customErr.classList.remove("show");
+      var t = ct.pct / 100;
+      if (sos >= t - EPS) {
+        customArea.innerHTML = renderAchieved(t, X, Y);
+      } else {
+        customArea.innerHTML = renderRoutes(t, X, Y, block, locked);
+      }
+    }
+
+    results.classList.add("show");
+    hasCalculated = true;
+  }
+
+  function recalcIfShown() {
+    if (hasCalculated) calculate();
+  }
+
+  // ---------- events ----------
+
+  calcBtn.addEventListener("click", calculate);
+
+  brandIn.addEventListener("input", recalcIfShown);
+  compIn.addEventListener("input", recalcIfShown);
+  blockSel.addEventListener("change", recalcIfShown);
+
+  brandIn.addEventListener("keydown", function (e) { if (e.key === "Enter") calculate(); });
+  compIn.addEventListener("keydown", function (e) { if (e.key === "Enter") calculate(); });
+
+  customNum.addEventListener("input", function () {
+    customSel.value = ""; // free entry overrides the dropdown selection display
+    recalcIfShown();
+  });
+  customSel.addEventListener("change", function () {
+    if (customSel.value !== "") customNum.value = customSel.value;
+    recalcIfShown();
+  });
+
+  lockToggle.addEventListener("change", function () {
+    var locked = lockToggle.checked;
+    brandIn.disabled = locked;
+    compIn.disabled = locked;
+    lockNote.classList.toggle("show", locked);
+    recalcIfShown();
+  });
+
+})();
+</script>
+</body>
+</html>
